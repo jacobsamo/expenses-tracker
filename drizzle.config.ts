@@ -1,0 +1,17 @@
+require("dotenv").config();
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/db/schemas",
+  out: "./drizzle/migrations",
+  dialect: "turso",
+  dbCredentials:
+    process.env.NODE_ENV === "production"
+      ? {
+          url: process.env.TURSO_CONNECTION_URL!,
+          authToken: process.env.TURSO_AUTH_TOKEN!,
+        }
+      : {
+          url: "file:./expenses-local.db",
+        },
+});
