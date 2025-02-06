@@ -5,7 +5,6 @@ import { useState } from "react";
 import Dropzone from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { extractReceipt } from "@/actions/create-expense";
 
 interface ImageFormProps {
   uploadedImageUrl: string | null;
@@ -18,6 +17,7 @@ const ImageForm = ({
 }: ImageFormProps) => {
   const [loadingImage, setLoadingImage] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const {mutate} = useMutaion()
 
   const convertToJpg = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -47,7 +47,7 @@ const ImageForm = ({
   const handleFileChange = async (file: File) => {
     try {
       setLoadingImage(true);
-
+      console.log("File: ", file);
       let convertedFile = file;
 
       if (file.type != "image/jpeg") {
@@ -94,7 +94,12 @@ const ImageForm = ({
   const uploadReceipt = async () => {
     if (!uploadFile) return;
 
-    const uploadReceipt = extractReceipt({
+    console.log("File tp upload", {
+      file: uploadFile,
+      size: uploadFile.size,
+    });
+
+    const uploadReceipt = mutate({
       receiptFile: uploadFile,
     });
 
@@ -115,18 +120,19 @@ const ImageForm = ({
     <>
       <Dropzone
         onDrop={(acceptedFiles: File[]) => {
+          console.log("Files uploaded", acceptedFiles);
           handleFileChange(acceptedFiles[0]!);
         }}
         maxFiles={1}
-        maxSize={1024 * 1024 * 3}
+        // maxSize={1024 * 1024 * 3}
         // accept={{ "image/*": [".jpg", ".jpeg", ".png"] }}
       >
         {({ getRootProps, getInputProps }) => (
           <div
             {...getRootProps()}
-            className="flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-700 hover:bg-gray-600"
+            className="flex h-52 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-700 hover:bg-gray-600"
           >
-            {!uploadedImageUrl && !loadingImage && (
+            {(!uploadFile || !uploadedImageUrl) && !loadingImage && (
               <div className="flex flex-col items-center justify-center pb-6 pt-5">
                 <Upload className="mb-3 h-10 w-10 text-gray-400" />
                 <p className="mb-2 text-sm text-gray-400">
@@ -137,7 +143,7 @@ const ImageForm = ({
                 <p className="text-xs text-gray-400">Max size 3mb</p>
               </div>
             )}
-            {uploadedImageUrl && !loadingImage && (
+            {(uploadFile || uploadedImageUrl) && !loadingImage && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={
