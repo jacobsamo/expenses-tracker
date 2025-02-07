@@ -1,5 +1,5 @@
 import { expenseItemsSchema, expensesSchema } from "@/lib/zod-schemas";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { env } from "env";
 import { z } from "zod";
@@ -35,10 +35,6 @@ const aiExpenseSchema = z.object({
 
 export const createExpenseFromReceiptUrl = async (receiptUrl: string) => {
   console.log("Starting ai extraction");
-  const google = createGoogleGenerativeAI({
-    apiKey: env.GOOGLE_API_KEY,
-  });
-
   const aiReq = await generateObject({
     model: google("gemini-1.5-flash", {
       structuredOutputs: true,
