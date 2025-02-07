@@ -1,10 +1,8 @@
-import "server-only";
-
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { env } from "env";
 
 export const uploadReceipt = async (receiptFile: File) => {
-  console.log("Starting upload");
+  console.log("Starting receipt upload");
 
   const s3 = new S3Client({
     endpoint: env.R2_ENDPOINT,
@@ -39,6 +37,8 @@ export const uploadReceipt = async (receiptFile: File) => {
 
   // Generate the file URL using the public bucket URL from env
   const receiptUrl = `${env.R2_PUBLIC_URL}/${uniqueFileName}`;
+
+  console.log("Receipt url", receiptUrl);
 
   return receiptUrl;
 };

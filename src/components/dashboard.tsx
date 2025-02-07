@@ -2,29 +2,38 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { useQuery } from "@tanstack/react-query";
+import type { Expense } from "@/types";
+import CreateExpenseModal from "./modals/create-expense-modal";
 
-interface Expense {
-  id: string
-  category: string
-  amount: number
-  date: string
-}
 
 export function Dashboard() {
-  const [expenses, setExpenses] = useState<Expense[]>([])
-
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      const response = await fetch("/api/expenses")
+  const { data: expenses } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: async () => {
+      const response = await fetch("/api/expenses");
       if (response.ok) {
-        const data = await response.json()
-        setExpenses(data)
+        return (await response.json()) as Expense[];
       }
-    }
-    fetchExpenses()
-  }, [])
+      return null;
+    },
+  });
 
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
+  if (!expenses) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>No Expenses Created Yet</CardTitle>
+        </CardHeader>
+        <CardContent>
+          Create A New Expense
+          <CreateExpenseModal />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const totalExpenses =  expenses.reduce((sum, expense) => sum + expense.amount, 0)
   const expensesByCategory = expenses.reduce(
     (acc, expense) => {
       acc[expense.category] = (acc[expense.category] || 0) + expense.amount

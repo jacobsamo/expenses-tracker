@@ -3,28 +3,11 @@ import { createExpenseFromReceiptUrl } from "@/db/actions/create-expense-from-re
 import { uploadReceipt } from "@/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/db/schemas";
 import { getSession } from "@/lib/auth/session";
-import { expenseItemsSchema, expensesSchema } from "@/lib/zod-schemas";
-import type { Expense, ExpenseItem } from "@/types";
+import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
+import type { Expense, ExpenseItem, NewExpense, NewExpenseItem } from "@/types";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-
-const createExpenseSchema = z.object({
-  type: z.literal("expense"),
-  content: z.object({
-    expense: expensesSchema,
-    expenseItems: expenseItemsSchema.array().nullable(),
-  }),
-});
-
-const receiptSchema = z.object({
-  type: z.literal("receipt"),
-  content: z.object({
-    receiptFile: z.instanceof(File),
-  }),
-});
-
-const CreateNewExpenseSchema = z.union([createExpenseSchema, receiptSchema]);
 
 export type CreateExpenseReturnType = {
   expense: Expense | null;
@@ -32,86 +15,90 @@ export type CreateExpenseReturnType = {
 };
 
 export async function POST(req: Request) {
-  const session = await getSession();
+  try {
+    const session = await getSession();
 
-  if (!session || !session.data?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+    if (!session || !session.data?.user) {
+      console.error("No user");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const json = await req.json();
-  const data = CreateNewExpenseSchema.parse(json);
-  let newExpense: Expense | null = null;
-  let newItems: ExpenseItem[] | null = null;
+    const { id: userId } = session.data.user;
+    console.log("User loged in", userId);
+    const json = await req.json();
+    const data = CreateNewExpenseSchema.parse(json);
+    console.log("Data sent to server", data);
+    if (!data.type || !data.content) {
+      return NextResponse.json({
+        error: "A creation type and or content needs to be provided",
+      });
+    }
 
-  switch (data.type) {
-    case "receipt":
+    let newExpense: NewExpense | null = null;
+    let newItems: Omit<NewExpenseItem, "expenseId" | "userId">[] | null = null;
+
+    // Process the request based on its type
+    if (data.type === "expense") {
+      newExpense = { ...data.content.expense, userId };
+      newItems = data.content.expenseItems ?? null;
+    } else if (data.type === "receipt") {
       const receiptUrl = await uploadReceipt(data.content.receiptFile);
-      const generateAiExpense = await createExpenseFromReceiptUrl(receiptUrl);
+      const aiResult = await createExpenseFromReceiptUrl(receiptUrl);
 
-      const [expense] = await db
-        .insert(expensesTable)
-        .values({
-          ...generateAiExpense.expense,
-          receiptUrl: receiptUrl,
-          userId: session.data.user.id,
-        })
-        .returning();
-      newExpense = expense;
+      newExpense = { ...aiResult.expense, receiptUrl, userId };
 
-      if (generateAiExpense.expenseItems) {
-        newItems = await db
-          .insert(itemsTable)
-          .values(
-            generateAiExpense.expenseItems.map((item) => {
-              return {
-                expenseId: expense.expenseId,
-                userId: session.data.user.id,
-                totalItemCost: item.totalItemCost ?? null,
-                costPerItem: item.costPerItem ?? null,
-                name: item.name ?? null,
-                quantity: item.quantity ?? null,
-              };
-            })
-          )
-          .returning();
+      if (aiResult.expenseItems) {
+        newItems = aiResult.expenseItems.map((item) => ({
+          totalItemCost: item.totalItemCost ?? null,
+          costPerItem: item.costPerItem ?? null,
+          name: item.name ?? null,
+          quantity: item.quantity ?? null,
+        }));
       }
-      break;
-    case "expense":
-      const [ex] = await db
-        .insert(expensesTable)
-        .values({
-          ...data.content.expense,
-          userId: session.data.user.id,
-        })
+    }
+
+    if (!newExpense) {
+      console.error("No expense found");
+      return NextResponse.json({ error: "No Expense found" }, { status: 400 });
+    }
+
+    // Insert the expense record into the database
+    const [expense] = await db
+      .insert(expensesTable)
+      .values(newExpense)
+      .returning();
+
+    // If there are expense items, insert them as well
+    let insertedItems: ExpenseItem[] | null = null;
+    if (newItems) {
+      insertedItems = await db
+        .insert(itemsTable)
+        .values(
+          newItems.map((item) => ({
+            ...item,
+            expenseId: expense.expenseId,
+            userId,
+          }))
+        )
         .returning();
-      newExpense = ex;
+    }
 
-      if (data.content.expenseItems) {
-        newItems = await db
-          .insert(itemsTable)
-          .values(
-            data.content.expenseItems.map((item) => {
-              return {
-                ...item,
-                expenseId: expense.expenseId,
-                userId: session.data.user.id,
-              };
-            })
-          )
-          .returning();
-      }
-      break;
-    default:
-      return NextResponse.json({ error: "No type set" }, { status: 401 });
+    console.log("New items", {});
+
+    return NextResponse.json({
+      expense: expense,
+      expenseItems: insertedItems,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    console.error("Error creating expense:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-
-  if (data.type == "receipt") {
-  }
-
-  return NextResponse.json({
-    expense: newExpense,
-    expenseItems: newItems,
-  });
 }
 
 export async function GET(req: Request) {

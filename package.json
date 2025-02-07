@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "bun dev && turso dev --db-file expense-local.db",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

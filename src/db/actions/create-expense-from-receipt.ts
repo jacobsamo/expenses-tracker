@@ -1,5 +1,3 @@
-import "server-only";
-
 import { expenseItemsSchema, expensesSchema } from "@/lib/zod-schemas";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
@@ -7,12 +5,23 @@ import { env } from "env";
 import { z } from "zod";
 
 const aiExpenseSchema = z.object({
-  expense: expensesSchema.omit({
-    receiptUrl: true,
-    userId: true,
-    createdAt: true,
-    expenseId: true,
-  }),
+  expense: expensesSchema
+    .omit({
+      receiptUrl: true,
+      userId: true,
+      createdAt: true,
+      expenseId: true,
+    })
+    .extend({
+      category: z.enum([
+        "fuel",
+        "groceries",
+        "food",
+        "activities",
+        "accommodation",
+        "going-out",
+      ]),
+    }),
   items: expenseItemsSchema
     .omit({
       expenseId: true,
@@ -50,6 +59,10 @@ export const createExpenseFromReceiptUrl = async (receiptUrl: string) => {
         ],
       },
     ],
+  });
+
+  console.log("Ai return result", {
+    ...aiReq,
   });
 
   return {

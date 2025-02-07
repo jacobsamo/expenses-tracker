@@ -1,23 +1,24 @@
 "use client";
+import type { CreateNewExpenseSchema } from "@/lib/zod-schemas";
 import imageCompress from "browser-image-compression";
 import { Loader2, Upload } from "lucide-react";
 import { useState } from "react";
 import Dropzone from "react-dropzone";
+import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
+import type { z } from "zod";
 
-interface ImageFormProps {
-  uploadedImageUrl: string | null;
-  setUploadedImageUrl: (url: string) => void;
-}
-
-const ImageForm = ({
-  setUploadedImageUrl,
-  uploadedImageUrl,
-}: ImageFormProps) => {
+const ImageForm = () => {
+  const form = useFormContext<z.infer<typeof CreateNewExpenseSchema>>();
   const [loadingImage, setLoadingImage] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const {mutate} = useMutaion()
+  const uploadedImageUrl = form.watch("content.expense.receiptUrl");
+
+  const setFile = (file: File) => {
+    setUploadFile(file);
+    form.setValue("content.receiptFile", file);
+    form.setValue("type", "receipt");
+  };
 
   const convertToJpg = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -81,7 +82,7 @@ const ImageForm = ({
       }
 
       setLoadingImage(false);
-      setUploadFile(convertedFile);
+      setFile(convertedFile);
     } catch (error) {
       console.error("Error processing image:", error);
       toast.error("Error processing image", {
@@ -89,31 +90,6 @@ const ImageForm = ({
       });
       setLoadingImage(false);
     }
-  };
-
-  const uploadReceipt = async () => {
-    if (!uploadFile) return;
-
-    console.log("File tp upload", {
-      file: uploadFile,
-      size: uploadFile.size,
-    });
-
-    const uploadReceipt = mutate({
-      receiptFile: uploadFile,
-    });
-
-    toast.promise(uploadReceipt, {
-      loading: "Uploading receipt...",
-      success: async (res) => {
-        if (typeof res?.data === "string") {
-          setUploadedImageUrl(res.data);
-          return "Receipt uploaded successfully!";
-        }
-        throw new Error("Error uploading receipt");
-      },
-      error: "Error uploading receipt",
-    });
   };
 
   return (
@@ -150,6 +126,8 @@ const ImageForm = ({
                   uploadFile
                     ? URL.createObjectURL(uploadFile)
                     : uploadedImageUrl
+                    ? uploadedImageUrl
+                    : "/placeholder.svg"
                 }
                 alt="uploaded image"
                 className="h-full w-full rounded-lg object-cover"
@@ -166,7 +144,6 @@ const ImageForm = ({
           </div>
         )}
       </Dropzone>
-      <Button onClick={() => uploadReceipt()}>Upload</Button>
     </>
   );
 };

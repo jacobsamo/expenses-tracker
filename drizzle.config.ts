@@ -12,6 +12,6 @@ export default defineConfig({
           authToken: process.env.TURSO_AUTH_TOKEN!,
         }
       : {
-          url: "file:./expenses-local.db",
+          url: "http://127.0.0.1:8080",
         },
 });

@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# DB
+expense-local.db
+expense-local.db-shm
+expense-local.db-wal

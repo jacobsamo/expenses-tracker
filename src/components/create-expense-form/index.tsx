@@ -1,160 +1,122 @@
-"use client"
-import React from "react";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "../ui/select";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
+"use client";
+import type { CreateNewExpenseSchema } from "@/lib/zod-schemas";
+import { useMutation } from "@tanstack/react-query";
+import { ArrowLeft, Pencil, Receipt } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { expensesSchema } from "@/lib/zod-schemas";
+import { toast } from "sonner";
 import { z } from "zod";
-import { DateTimePicker } from "../ui/date-time-picker";
+import { Button } from "../ui/button";
+import { Form } from "../ui/form";
+import ExpenseForm from "./expense-form";
 import ImageForm from "./image-form";
 
-const ExpenseForm = () => {
-  const form = useForm<z.infer<typeof expensesSchema>>({
-    resolver: zodResolver(expensesSchema),
-  });
-  const { control, handleSubmit, setValue, getValues } = form;
+type TCreateNewExpenseSchema = z.infer<typeof CreateNewExpenseSchema>;
 
-  const onSubmit = async (data: z.infer<typeof expensesSchema>) => {
-    console.log(data);
+const CreateExpenseForm = () => {
+  const form = useForm<TCreateNewExpenseSchema>();
+  const {
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = form;
+  const formType = form.watch("type");
+
+  useEffect(() => {
+    console.log("errors", {
+      errors: errors,
+      values: getValues(),
+    });
+  }, [errors]);
+
+  const clearForm = () => {
+    form.reset();
   };
+
+  const handleTypeChange = (type: TCreateNewExpenseSchema["type"]) => {
+    form.reset();
+    form.setValue("type", type);
+
+    if (type == "expense") form.setValue("content.expense.date", new Date());
+  };
+
+  const createExpense = useMutation({
+    mutationKey: ["createRecipe"],
+    mutationFn: async (data: TCreateNewExpenseSchema) => {
+      const req = await fetch("/api/expenses", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!req.ok) {
+        throw Error(await req.json());
+      }
+
+      const res = await req.json();
+
+      return res;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message, {
+        description: "Created Expense!",
+      });
+      clearForm();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const onSubmit = (data: z.infer<typeof CreateNewExpenseSchema>) =>
+    createExpense.mutate(data);
 
   return (
     <div>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField
-            control={control}
-            name="category"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <FormControl>
-                  <Select {...field}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fuel">Fuel</SelectItem>
-                      <SelectItem value="lodging">Lodging</SelectItem>
-                      <SelectItem value="food">Food</SelectItem>
-                      <SelectItem value="activities">Activities</SelectItem>
-                      <SelectItem value="accommodation">
-                        Accommodation
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!formType && (
+            <>
+              <Button
+                type="button"
+                onClick={() => handleTypeChange("expense")}
+                size="lg"
+                variant="secondary"
+              >
+                <Pencil />
+                Manual
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleTypeChange("receipt")}
+                size="lg"
+                variant="secondary"
+              >
+                <Receipt />
+                Receipt
+              </Button>
+            </>
+          )}
 
-          <FormField
-            control={control}
-            name="business"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Business Name</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    value={field.value ?? ""}
-                    placeholder="Business Name"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {formType && (
+            <>
+              <Button type="button" onClick={() => handleTypeChange(null)}>
+                <ArrowLeft /> Back
+              </Button>
 
-          <FormField
-            control={control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    value={field.value ?? ""}
-                    placeholder="Description"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {formType === "receipt" && <ImageForm />}
 
-          <FormField
-            control={control}
-            name="amount"
-            rules={{
-              required: true,
-            }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    inputMode="numeric"
-                    placeholder="Amount"
-                    value={field.value ? Number(field.value) : undefined}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {formType === "expense" && <ExpenseForm />}
 
-          <FormField
-            control={control}
-            name="date"
-            rules={{ required: true }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date</FormLabel>
-                <FormControl>
-                  <DateTimePicker
-                    date={field.value ? new Date(field.value) : new Date()}
-                    setDate={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <ImageForm
-            setUploadedImageUrl={(url) => setValue("receiptUrl", url)}
-            uploadedImageUrl={getValues("receiptUrl") ?? null}
-          />
-
-          <Button type="submit">Add Expense</Button>
+              <Button type="submit">Add Expense</Button>
+            </>
+          )}
         </form>
       </Form>
     </div>
   );
 };
 
-export default ExpenseForm;
+export default CreateExpenseForm;

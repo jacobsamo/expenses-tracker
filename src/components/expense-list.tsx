@@ -1,28 +1,27 @@
 "use client";
-import { useState, useEffect } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
-interface Expense {
-  id: string
-  category: string
-  amount: number
-  date: string
-  description: string
-}
+import { useState, useEffect } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
+import type { Expense } from "@/types";
 
 export function ExpenseList() {
-  const [expenses, setExpenses] = useState<Expense[]>([])
-
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      const response = await fetch("/api/expenses")
+  const { data: expenses } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: async () => {
+      const response = await fetch("/api/expenses");
       if (response.ok) {
-        const data = await response.json()
-        setExpenses(data)
+        return (await response.json()) as Expense[];
       }
-    }
-    fetchExpenses()
-  }, [])
+      return null;
+    },
+  });
 
   return (
     <Table>
@@ -30,21 +29,25 @@ export function ExpenseList() {
         <TableRow>
           <TableHead>Category</TableHead>
           <TableHead>Amount</TableHead>
+          <TableHead>Business Name</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Description</TableHead>
+          <TableHead>Receipt</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {expenses.map((expense) => (
-          <TableRow key={expense.id}>
-            <TableCell>{expense.category}</TableCell>
-            <TableCell>${expense.amount.toFixed(2)}</TableCell>
-            <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
-            <TableCell>{expense.description}</TableCell>
-          </TableRow>
-        ))}
+        {expenses &&
+          expenses.map((expense) => (
+            <TableRow key={expense.expenseId}>
+              <TableCell>{expense.category}</TableCell>
+              <TableCell>${expense.amount.toFixed(2)}</TableCell>
+              <TableCell>{expense.business}</TableCell>
+              <TableCell>{new Date(expense.date).toDateString()}</TableCell>
+              <TableCell>{expense.description}</TableCell>
+              <TableCell>{expense.receiptUrl}</TableCell>
+            </TableRow>
+          ))}
       </TableBody>
     </Table>
-  )
+  );
 }
-
