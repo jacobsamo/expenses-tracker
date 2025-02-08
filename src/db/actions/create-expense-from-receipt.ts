@@ -22,15 +22,15 @@ const aiExpenseSchema = z.object({
         "going-out",
       ]),
     }),
-  items: expenseItemsSchema
-    .omit({
-      expenseId: true,
-      itemId: true,
-      createdAt: true,
-      userId: true,
-    })
-    .array()
-    .nullable(),
+  // items: expenseItemsSchema
+  //   .omit({
+  //     expenseId: true,
+  //     itemId: true,
+  //     createdAt: true,
+  //     userId: true,
+  //   })
+  //   .array()
+  //   .nullable(),
 });
 
 export const fileToDataContent = async (file: File) => {
