@@ -1,5 +1,5 @@
-import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import { real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { v4 as uuid } from "uuid";
 import { user } from "./auth-schema";
 
@@ -22,7 +22,7 @@ export const expensesTable = sqliteTable("expenses", {
     .references(() => user.id),
   business: text("business"),
   category: text("category").notNull(),
-  amount: integer("amount").notNull(),
+  amount: real("amount").notNull(),
   description: text("description"),
   receiptUrl: text("receipt_url"),
   date: text("date")
@@ -43,9 +43,9 @@ export const itemsTable = sqliteTable("items", {
   expenseId: text("expense_id")
     .notNull()
     .references(() => expensesTable.expenseId),
-  totalItemCost: integer("total_item_cost"),
-  quantity: integer("quantity"),
-  costPerItem: integer("cost_per_item"),
+  totalItemCost: real("total_item_cost"),
+  quantity: real("quantity"),
+  costPerItem: real("cost_per_item"),
   name: text("name"),
   userId: text("user_id")
     .notNull()

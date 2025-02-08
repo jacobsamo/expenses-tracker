@@ -1,8 +1,8 @@
 "use client";
 import type { CreateNewExpenseSchema } from "@/lib/zod-schemas";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Pencil, Receipt } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowLeft, Loader2, Pencil, Receipt } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -14,6 +14,8 @@ import ImageForm from "./image-form";
 type TCreateNewExpenseSchema = z.infer<typeof CreateNewExpenseSchema>;
 
 const CreateExpenseForm = () => {
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<TCreateNewExpenseSchema>();
   const {
     handleSubmit,
@@ -43,6 +45,7 @@ const CreateExpenseForm = () => {
   const createExpense = useMutation({
     mutationKey: ["createRecipe"],
     mutationFn: async (data: TCreateNewExpenseSchema) => {
+      setLoading(true);
       const formData = new FormData();
 
       if (!data.type) {
@@ -68,16 +71,18 @@ const CreateExpenseForm = () => {
       }
 
       const res = await req.json();
-
+      
       return res;
     },
     onSuccess: (data) => {
       toast.success(data.message, {
         description: "Created Expense!",
       });
+      setLoading(false);
       clearForm();
     },
     onError: (error) => {
+      setLoading(false);
       toast.error(error.message);
     },
   });
@@ -130,8 +135,15 @@ const CreateExpenseForm = () => {
 
               {formType === "expense" && <ExpenseForm />}
 
-              <Button type="submit" className="mt-4">
-                Add Expense
+              <Button type="submit" className="mt-4" disabled={loading}>
+                {loading ? (
+                  <>
+                    Creating Expense
+                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  "Create Expense"
+                )}
               </Button>
             </>
           )}

@@ -6,7 +6,6 @@ export const expensesSchema = createInsertSchema(expensesTable);
 
 export const expenseItemsSchema = createInsertSchema(itemsTable);
 
-
 export const nullAbleSchema = z.object({
   type: z.literal(null),
   content: z.literal(null),

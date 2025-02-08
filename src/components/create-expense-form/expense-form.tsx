@@ -109,7 +109,7 @@ const ExpenseForm = () => {
                 type="number"
                 inputMode="numeric"
                 placeholder="Amount"
-                value={field.value ? Number(field.value) : ""}
+                value={field.value ? field.value : ""}
                 onChange={(e) => field.onChange(parseFloat(e.target.value))}
               />
             </FormControl>

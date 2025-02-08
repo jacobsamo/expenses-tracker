@@ -11,7 +11,7 @@ import type { Expense } from "@/types";
 
 export function ExpenseLineChart({ expenses }: { expenses: Expense[] }) {
   const dailyExpenses = expenses.reduce((acc, expense) => {
-    const date = expense.date.toISOString().split("T")[0];
+    const date = expense.date.toString().split("T")[0];
     acc[date] = (acc[date] || 0) + expense.amount;
     return acc;
   }, {} as Record<string, number>);

@@ -52,7 +52,7 @@ export const createExpenseFromReceiptUrl = async (receiptFile: File) => {
         content: [
           {
             type: "text",
-            text: "Extract the expense from the receipt image",
+            text: "Extract the expense from the receipt image, the amount is a float not an integer which is in dollars and cents",
           },
           {
             type: "image",
