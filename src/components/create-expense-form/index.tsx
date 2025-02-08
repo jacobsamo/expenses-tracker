@@ -43,12 +43,24 @@ const CreateExpenseForm = () => {
   const createExpense = useMutation({
     mutationKey: ["createRecipe"],
     mutationFn: async (data: TCreateNewExpenseSchema) => {
+      const formData = new FormData();
+
+      if (!data.type) {
+        toast.error("Please select a type");
+        return;
+      }
+
+      formData.append("type", data.type);
+
+      if (data.type === "receipt") {
+        formData.append("receiptFile", data.content.receiptFile);
+      } else {
+        formData.append("content", JSON.stringify(data.content));
+      }
+
       const req = await fetch("/api/expenses", {
         method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: formData,
       });
 
       if (!req.ok) {
@@ -70,20 +82,27 @@ const CreateExpenseForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof CreateNewExpenseSchema>) =>
+  const onSubmit = (data: z.infer<typeof CreateNewExpenseSchema>) => {
+    console.log("Data submitted", {
+      data,
+      typeOfContent:
+        data.type === "receipt" ? typeof data.content.receiptFile : "expense",
+    });
     createExpense.mutate(data);
+  };
 
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
           {!formType && (
-            <>
+            <div className="inline-flex gap-2 items-center">
               <Button
                 type="button"
                 onClick={() => handleTypeChange("expense")}
                 size="lg"
                 variant="secondary"
+                className="size-52"
               >
                 <Pencil />
                 Manual
@@ -93,11 +112,12 @@ const CreateExpenseForm = () => {
                 onClick={() => handleTypeChange("receipt")}
                 size="lg"
                 variant="secondary"
+                className="size-52"
               >
                 <Receipt />
                 Receipt
               </Button>
-            </>
+            </div>
           )}
 
           {formType && (
@@ -110,7 +130,9 @@ const CreateExpenseForm = () => {
 
               {formType === "expense" && <ExpenseForm />}
 
-              <Button type="submit">Add Expense</Button>
+              <Button type="submit" className="mt-4">
+                Add Expense
+              </Button>
             </>
           )}
         </form>

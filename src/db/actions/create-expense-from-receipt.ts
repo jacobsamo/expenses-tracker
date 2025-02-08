@@ -30,15 +30,21 @@ const aiExpenseSchema = z.object({
       userId: true,
     })
     .array()
-    .optional(),
+    .nullable(),
 });
 
-export const createExpenseFromReceiptUrl = async (receiptUrl: string) => {
+export const fileToDataContent = async (file: File) => {
+  const arrayBuffer = await file.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
+};
+
+export const createExpenseFromReceiptUrl = async (receiptFile: File) => {
   console.log("Starting ai extraction");
+
+  const fileArray = await fileToDataContent(receiptFile);
+
   const aiReq = await generateObject({
-    model: google("gemini-1.5-flash", {
-      structuredOutputs: true,
-    }),
+    model: google("gemini-1.5-flash"),
     schema: aiExpenseSchema,
     messages: [
       {
@@ -50,7 +56,7 @@ export const createExpenseFromReceiptUrl = async (receiptUrl: string) => {
           },
           {
             type: "image",
-            image: receiptUrl,
+            image: fileArray,
           },
         ],
       },
@@ -63,6 +69,6 @@ export const createExpenseFromReceiptUrl = async (receiptUrl: string) => {
 
   return {
     expense: aiReq.object.expense,
-    expenseItems: aiReq.object.items ?? null,
+    expenseItems: null,
   };
 };

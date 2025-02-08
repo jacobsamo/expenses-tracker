@@ -12,12 +12,14 @@ const ImageForm = () => {
   const form = useFormContext<z.infer<typeof CreateNewExpenseSchema>>();
   const [loadingImage, setLoadingImage] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const uploadedImageUrl = form.watch("content.expense.receiptUrl");
+  const imageUrl = uploadFile
+    ? URL.createObjectURL(uploadFile)
+    : form.watch("content.expense.receiptUrl");
 
   const setFile = (file: File) => {
     setUploadFile(file);
-    form.setValue("content.receiptFile", file);
     form.setValue("type", "receipt");
+    form.setValue("content.receiptFile", file);
   };
 
   const convertToJpg = (file: File): Promise<string> => {
@@ -108,7 +110,7 @@ const ImageForm = () => {
             {...getRootProps()}
             className="flex h-52 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-700 hover:bg-gray-600"
           >
-            {(!uploadFile || !uploadedImageUrl) && !loadingImage && (
+            {!imageUrl && !loadingImage && (
               <div className="flex flex-col items-center justify-center pb-6 pt-5">
                 <Upload className="mb-3 h-10 w-10 text-gray-400" />
                 <p className="mb-2 text-sm text-gray-400">
@@ -119,16 +121,10 @@ const ImageForm = () => {
                 <p className="text-xs text-gray-400">Max size 3mb</p>
               </div>
             )}
-            {(uploadFile || uploadedImageUrl) && !loadingImage && (
+            {imageUrl && !loadingImage && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={
-                  uploadFile
-                    ? URL.createObjectURL(uploadFile)
-                    : uploadedImageUrl
-                    ? uploadedImageUrl
-                    : "/placeholder.svg"
-                }
+                src={imageUrl ?? "/placeholder.svg"}
                 alt="uploaded image"
                 className="h-full w-full rounded-lg object-cover"
               />

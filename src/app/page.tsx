@@ -1,10 +1,11 @@
 import { getSession } from "@/lib/auth/session";
-import { Dashboard } from "@/components/dashboard";
+import Dashboard from "@/components/dashboard";
 import ExpenseForm from "@/components/create-expense-form";
 import { ExpenseList } from "@/components/expense-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import CreateExpenseModal from "@/components/modals/create-expense-modal";
 
 export default async function Home() {
   const session = await getSession();
@@ -37,13 +38,17 @@ export default async function Home() {
         <TabsContent value="dashboard">
           <Dashboard />
         </TabsContent>
-        <TabsContent value="add-expense">
+        <TabsContent value="add-expense" className="flex items-center justify-center w-full">
           <ExpenseForm />
         </TabsContent>
         <TabsContent value="expense-list">
           <ExpenseList />
         </TabsContent>
       </Tabs>
+
+      <div className="absolute bottom-8 right-8">
+        <CreateExpenseModal triggerType="circle" />
+      </div>
     </div>
   );
 }

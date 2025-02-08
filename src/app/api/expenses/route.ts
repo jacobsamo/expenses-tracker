@@ -3,11 +3,17 @@ import { createExpenseFromReceiptUrl } from "@/db/actions/create-expense-from-re
 import { uploadReceipt } from "@/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/db/schemas";
 import { getSession } from "@/lib/auth/session";
-import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
+import {
+  CreateNewExpenseSchema,
+  receiptSchema,
+  createExpenseSchema,
+} from "@/lib/zod-schemas";
 import type { Expense, ExpenseItem, NewExpense, NewExpenseItem } from "@/types";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
+const schema = z.union([receiptSchema, createExpenseSchema]);
 
 export type CreateExpenseReturnType = {
   expense: Expense | null;
@@ -24,15 +30,36 @@ export async function POST(req: Request) {
     }
 
     const { id: userId } = session.data.user;
-    console.log("User loged in", userId);
-    const json = await req.json();
-    const data = CreateNewExpenseSchema.parse(json);
-    console.log("Data sent to server", data);
-    if (!data.type || !data.content) {
-      return NextResponse.json({
-        error: "A creation type and or content needs to be provided",
-      });
+    const formData = await req.formData();
+
+    const type = formData.get("type");
+    if (!type || (type !== "expense" && type !== "receipt")) {
+      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
+
+    let reqData;
+    if (type === "receipt") {
+      const receiptFile = formData.get("receiptFile");
+
+      if (!(receiptFile instanceof Blob)) {
+        return NextResponse.json(
+          { error: "Invalid file type" },
+          { status: 400 }
+        );
+      }
+
+      reqData = { type, content: { receiptFile } };
+    } else {
+      const content = formData.get("content");
+      if (!content) {
+        return NextResponse.json({ error: "Missing content" }, { status: 400 });
+      }
+
+      reqData = { type, content: JSON.parse(content as string) };
+    }
+
+    // Validate the parsed data using Zod
+    const data = CreateNewExpenseSchema.parse(reqData);
 
     let newExpense: NewExpense | null = null;
     let newItems: Omit<NewExpenseItem, "expenseId" | "userId">[] | null = null;
@@ -43,17 +70,27 @@ export async function POST(req: Request) {
       newItems = data.content.expenseItems ?? null;
     } else if (data.type === "receipt") {
       const receiptUrl = await uploadReceipt(data.content.receiptFile);
-      const aiResult = await createExpenseFromReceiptUrl(receiptUrl);
+      const aiResult = await createExpenseFromReceiptUrl(
+        data.content.receiptFile
+      );
 
-      newExpense = { ...aiResult.expense, receiptUrl, userId };
+      newExpense = {
+        ...aiResult.expense,
+        date: aiResult.expense.date
+          ? new Date(aiResult.expense.date)
+          : new Date(),
+        receiptUrl,
+        userId,
+      };
 
       if (aiResult.expenseItems) {
-        newItems = aiResult.expenseItems.map((item) => ({
-          totalItemCost: item.totalItemCost ?? null,
-          costPerItem: item.costPerItem ?? null,
-          name: item.name ?? null,
-          quantity: item.quantity ?? null,
-        }));
+        newItems = null;
+        // newItems = aiResult.expenseItems.map((item) => ({
+        //   totalItemCost: item.totalItemCost ?? null,
+        //   costPerItem: item.costPerItem ?? null,
+        //   name: item.name ?? null,
+        //   quantity: item.quantity ?? null,
+        // }));
       }
     }
 
@@ -90,10 +127,11 @@ export async function POST(req: Request) {
       expenseItems: insertedItems,
     });
   } catch (error) {
+    console.error("Error creating expense:", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
-    console.error("Error creating expense:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
@@ -103,6 +141,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const session = await getSession();
+
   if (!session || !session.data?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
