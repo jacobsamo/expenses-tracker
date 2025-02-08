@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { createExpenseFromReceiptUrl } from "@/db/actions/create-expense-from-receipt";
 import { uploadReceipt } from "@/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/db/schemas";
-import { getSession } from "@/lib/auth/session";
+import { getSession } from "@/lib/session";
 import {
   CreateNewExpenseSchema,
   receiptSchema,
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
       newExpense = {
         ...aiResult.expense,
         date: aiResult.expense.date
-          ? new Date(aiResult.expense.date)
+          ? new Date(aiResult.expense.date.toString())
           : new Date(),
         receiptUrl,
         userId,
@@ -100,6 +100,7 @@ export async function POST(req: Request) {
     }
 
     // Insert the expense record into the database
+    console.log("New expense", newExpense);
     const [expense] = await db
       .insert(expensesTable)
       .values(newExpense)

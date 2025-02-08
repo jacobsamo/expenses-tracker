@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth/session";
+import { getSession } from "@/lib/session";
 import Dashboard from "@/components/dashboard";
 import ExpenseForm from "@/components/create-expense-form";
 import { ExpenseList } from "@/components/expense-list";
@@ -38,7 +38,10 @@ export default async function Home() {
         <TabsContent value="dashboard">
           <Dashboard />
         </TabsContent>
-        <TabsContent value="add-expense" className="flex items-center justify-center w-full">
+        <TabsContent
+          value="add-expense"
+          className="flex items-center justify-center w-full"
+        >
           <ExpenseForm />
         </TabsContent>
         <TabsContent value="expense-list">

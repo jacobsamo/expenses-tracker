@@ -1,6 +1,6 @@
 "use server";
 import { headers } from "next/headers";
-import { authClient } from "./client";
+import { authClient } from "./auth-client";
 
 export const getSession = async () => {
   const session = await authClient.getSession({

@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth/session";
+import { getSession } from "@/lib/session";
 import {
   DEFAULT_SERVER_ERROR_MESSAGE,
   createSafeActionClient,
