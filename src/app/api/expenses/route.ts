@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { createExpenseFromReceiptUrl } from "@/db/actions/create-expense-from-receipt";
+import { createExpenseFromFile } from "@/db/actions/create-expense-from-file";
 import { uploadReceipt } from "@/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/db/schemas";
 import { getSession } from "@/lib/session";
@@ -70,9 +70,7 @@ export async function POST(req: Request) {
       newItems = data.content.expenseItems ?? null;
     } else if (data.type === "receipt") {
       const receiptUrl = await uploadReceipt(data.content.receiptFile);
-      const aiResult = await createExpenseFromReceiptUrl(
-        data.content.receiptFile
-      );
+      const aiResult = await createExpenseFromFile(data.content.receiptFile);
 
       newExpense = {
         ...aiResult.expense,
@@ -100,7 +98,6 @@ export async function POST(req: Request) {
     }
 
     // Insert the expense record into the database
-    console.log("New expense", newExpense);
     const [expense] = await db
       .insert(expensesTable)
       .values(newExpense)
@@ -121,7 +118,6 @@ export async function POST(req: Request) {
         .returning();
     }
 
-    console.log("New items", {});
 
     return NextResponse.json({
       expense: expense,

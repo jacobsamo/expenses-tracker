@@ -3,6 +3,7 @@ import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { env } from "env";
 import { z } from "zod";
+import { categoryEnum } from "../schemas";
 
 const aiExpenseSchema = z.object({
   expense: expensesSchema
@@ -11,16 +12,11 @@ const aiExpenseSchema = z.object({
       userId: true,
       createdAt: true,
       expenseId: true,
+      date: true,
     })
     .extend({
-      category: z.enum([
-        "fuel",
-        "groceries",
-        "food",
-        "activities",
-        "accommodation",
-        "going-out",
-      ]),
+      category: z.enum(categoryEnum),
+      date: z.string()
     }),
   // items: expenseItemsSchema
   //   .omit({
@@ -38,13 +34,13 @@ export const fileToDataContent = async (file: File) => {
   return new Uint8Array(arrayBuffer);
 };
 
-export const createExpenseFromReceiptUrl = async (receiptFile: File) => {
+export const createExpenseFromFile = async (receiptFile: File) => {
   console.log("Starting ai extraction");
 
   const fileArray = await fileToDataContent(receiptFile);
 
   const aiReq = await generateObject({
-    model: google("gemini-1.5-flash"),
+    model: google("gemini-1.5-flash-8b-latest"),
     schema: aiExpenseSchema,
     messages: [
       {
@@ -52,7 +48,7 @@ export const createExpenseFromReceiptUrl = async (receiptFile: File) => {
         content: [
           {
             type: "text",
-            text: "Extract the expense from the receipt image, the amount is a float not an integer which is in dollars and cents",
+            text: "Extract the expense from the receipt image, the amount is a float not an integer which is in dollars and cents, return the date as a javascript Date object",
           },
           {
             type: "image",
@@ -64,7 +60,18 @@ export const createExpenseFromReceiptUrl = async (receiptFile: File) => {
   });
 
   console.log("Ai return result", {
-    ...aiReq,
+    object: aiReq.object,
+    dateFromObject: {
+      date: aiReq.object.expense.date,
+      jsDate: aiReq.object.expense.date
+        ? new Date(aiReq.object.expense.date.toString())
+        : null,
+    },
+    response: aiReq.response,
+    finishReason: aiReq.finishReason,
+    usage: aiReq.usage,
+    warning: aiReq.warnings,
+    metadata: aiReq.experimental_providerMetadata,
   });
 
   return {

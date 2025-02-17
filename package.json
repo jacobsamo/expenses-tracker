@@ -14,7 +14,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:setup": "touch expenses-local.db && bun db:generate"
+    "db:setup": "touch expenses-local.db && bun db:generate",
+    "db:local-start": "turso dev --db-file expense-local.db"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.1.10",

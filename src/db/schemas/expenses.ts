@@ -2,6 +2,19 @@ import { sql } from "drizzle-orm";
 import { real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { v4 as uuid } from "uuid";
 import { user } from "./auth-schema";
+import { customType } from "drizzle-orm/sqlite-core";
+
+const dateType = customType<{ data: Date; driverData: string }>({
+  dataType() {
+    return "text";
+  },
+  toDriver(value: Date): string {
+    return value.toISOString();
+  },
+  fromDriver(value: string): Date {
+    return new Date(value);
+  },
+});
 
 export const categoryEnum = [
   "fuel",
@@ -25,14 +38,10 @@ export const expensesTable = sqliteTable("expenses", {
   amount: real("amount").notNull(),
   description: text("description"),
   receiptUrl: text("receipt_url"),
-  date: text("date")
-    .notNull()
-    .default(sql`(CURRENT_TIMESTAMP)`)
-    .$type<Date>(),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(CURRENT_TIMESTAMP)`)
-    .$type<Date>(),
+  date: dateType("date").notNull(),
+  createdAt: dateType("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
 });
 
 export const itemsTable = sqliteTable("items", {
@@ -50,10 +59,9 @@ export const itemsTable = sqliteTable("items", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
-  createdAt: text("created_at")
-    .notNull()
-    .default(sql`(CURRENT_TIMESTAMP)`)
-    .$type<Date>(),
+  createdAt: dateType("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
 });
 
 // export const businessesTable = sqliteTable("business", {
