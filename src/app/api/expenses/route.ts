@@ -12,6 +12,7 @@ import type { Expense, ExpenseItem, NewExpense, NewExpenseItem } from "@/types";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+// import { unstable_cacheTag as cacheTag, revalidateTag } from "next/cache";
 
 const schema = z.union([receiptSchema, createExpenseSchema]);
 
@@ -103,6 +104,8 @@ export async function POST(req: Request) {
       .values(newExpense)
       .returning();
 
+    // revalidateTag("expenses");
+
     // If there are expense items, insert them as well
     let insertedItems: ExpenseItem[] | null = null;
     if (newItems) {
@@ -116,8 +119,8 @@ export async function POST(req: Request) {
           }))
         )
         .returning();
+      // revalidateTag("expense-items");
     }
-
 
     return NextResponse.json({
       expense: expense,
@@ -143,10 +146,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // ("use cache");
   const userExpenses = await db
-    .select()
-    .from(expensesTable)
-    .where(eq(expensesTable.userId, session.data.user.id));
+  .select()
+  .from(expensesTable)
+  .where(eq(expensesTable.userId, session.data.user.id));
+  // cacheTag("expenses");
+ 
 
   return NextResponse.json(userExpenses);
 }

@@ -1,16 +1,51 @@
+
 "use client";
-import { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import type { Expense } from "@/types";
 import { format } from "date-fns";
+import type { ColumnDef } from "@tanstack/react-table"
+import { DataTableColumnHeader } from "@/components/ui/data-table/sortable-column-header";
+import { DataTable } from "@/components/ui/data-table";
+
+
+export const expenseTableColumns: ColumnDef<Expense>[] = [
+  {
+    accessorKey: "category",
+    header: "Category",
+  },
+  {
+    accessorKey: "amount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Amount" />
+    ),
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"))
+      const formatted = new Intl.NumberFormat("en-Au", {
+        style: "currency",
+        currency: "AUD",
+      }).format(amount)
+
+      return <div className="text-right font-medium">{formatted}</div>
+    },
+  },
+  {
+    accessorKey: "business",
+    header: "Business Name",
+  },
+  {
+    accessorKey: "date",
+    header: "Date",
+    cell: ({ row }) => <div className="text-right font-medium">{format(new Date(row.getValue("date")), "PP p")}</div>
+  },
+  {
+    accessorKey: "description",
+    header: "Description"
+  },
+  {
+    accessorKey: "receiptUrl",
+    header: "Receipt"
+  },
+]
 
 export function ExpenseList() {
   const { data: expenses } = useQuery({
@@ -23,32 +58,8 @@ export function ExpenseList() {
       return null;
     },
   });
+  if (!expenses || expenses === undefined) return <div>Not Expense created yet</div>
 
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Category</TableHead>
-          <TableHead>Amount</TableHead>
-          <TableHead>Business Name</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead>Receipt</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {expenses &&
-          expenses.map((expense) => (
-            <TableRow key={expense.expenseId}>
-              <TableCell>{expense.category}</TableCell>
-              <TableCell>${expense.amount.toFixed(2)}</TableCell>
-              <TableCell>{expense.business}</TableCell>
-              <TableCell>{format(new Date(expense.date), "PP p")}</TableCell>
-              <TableCell>{expense.description}</TableCell>
-              <TableCell>{expense.receiptUrl}</TableCell>
-            </TableRow>
-          ))}
-      </TableBody>
-    </Table>
-  );
+  return <DataTable columns={expenseTableColumns} data={expenses} />
+
 }

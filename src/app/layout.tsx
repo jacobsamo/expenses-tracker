@@ -5,6 +5,12 @@ import Providers from "@/components/providers";
 export const metadata: Metadata = {
   title: "Expense Tracker",
   description: "A simple expense tracker app built with Next.js",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
