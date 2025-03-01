@@ -6,6 +6,7 @@
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "vinxi start",
+    "preview": "bunx wrangler pages dev dist/",
     "lint": "eslint .",
     "format": "prettier --write .",
     "ui": "bunx --bun shadcn@canary",

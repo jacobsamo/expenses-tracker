@@ -1,5 +1,6 @@
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
+import { cloudflare } from "unenv";
 import tsConfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
@@ -11,9 +12,8 @@ export default defineConfig({
       tailwindcss(),
     ],
   },
-
   server: {
-    // https://tanstack.com/start/latest/docs/framework/react/hosting#deployment
-    // preset: "netlify",
+    preset: "cloudflare-pages",
+    unenv: cloudflare,
   },
 });
