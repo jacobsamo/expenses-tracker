@@ -1,8 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require("dotenv").config();
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/db/schemas",
+  schema: "./lib/server/db/schemas",
   out: "./drizzle/migrations",
   dialect: "turso",
   dbCredentials:
