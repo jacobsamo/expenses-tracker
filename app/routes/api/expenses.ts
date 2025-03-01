@@ -4,40 +4,34 @@ import { uploadReceipt } from "@/lib/server/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/lib/server/db/schemas";
 import { getSession } from "@/lib/session";
 import type { Expense, ExpenseItem, NewExpense, NewExpenseItem } from "@/lib/types";
-import {
-  // createExpenseSchema,
-  CreateNewExpenseSchema,
-} from "@/lib/zod-schemas";
+import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-// const schema = z.union([receiptSchema, createExpenseSchema]);
 
 export type CreateExpenseReturnType = {
   expense: Expense | null;
   expenseItems: ExpenseItem[] | null;
 };
 
-export const APIRoute = createAPIFileRoute("/api/expsenes")({
+export const APIRoute = createAPIFileRoute("/api/expenses")({
   GET: async ({ request }) => {
-    const session = await getSession({headers: request.headers});
+    const session = await getSession({ headers: request.headers });
 
     if (!session || !session.data?.user) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ("use cache");
     const userExpenses = await db
       .select()
       .from(expensesTable)
       .where(eq(expensesTable.userId, session.data.user.id));
-    // cacheTag("expenses");
 
     return Response.json(userExpenses);
   },
   POST: async ({ request }) => {
     try {
-      const session = await getSession({headers: request.headers});
+      const session = await getSession({ headers: request.headers });
 
       if (!session || !session.data?.user) {
         console.error("No user");

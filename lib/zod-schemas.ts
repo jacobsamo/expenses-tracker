@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { createInsertSchema } from "drizzle-zod";
 import { expensesTable, itemsTable } from "@/lib/server/db/schemas";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const expensesSchema = createInsertSchema(expensesTable);
 
@@ -19,6 +19,13 @@ export const createExpenseSchema = z.object({
     }),
     expenseItems: expenseItemsSchema.array().nullish(),
   }),
+});
+
+export const updateExpenseSchema = z.object({
+  expense: expensesSchema.extend({
+    userId: z.string().optional(),
+  }),
+  expenseItems: expenseItemsSchema.array().nullish(),
 });
 
 export const receiptSchema = z.object({

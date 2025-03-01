@@ -42,7 +42,7 @@ const CreateExpenseForm = () => {
   };
 
   const createExpense = useMutation({
-    mutationKey: ["createRecipe"],
+    mutationKey: ["createExpense", "expenses"],
     mutationFn: async (data: TCreateNewExpenseSchema) => {
       setLoading(true);
       const formData = new FormData();
@@ -96,59 +96,57 @@ const CreateExpenseForm = () => {
   };
 
   return (
-    <div>
-      <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full">
-          {!formType && (
-            <div className="inline-flex gap-2 items-center">
-              <Button
-                type="button"
-                onClick={() => handleTypeChange("expense")}
-                size="lg"
-                variant="secondary"
-                className="size-52"
-              >
-                <Pencil />
-                Manual
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleTypeChange("receipt")}
-                size="lg"
-                variant="secondary"
-                className="size-52"
-              >
-                <Receipt />
-                Receipt
-              </Button>
-            </div>
-          )}
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 p-2 w-full">
+        {!formType && (
+          <div className="inline-flex gap-2 items-center justify-center">
+            <Button
+              type="button"
+              onClick={() => handleTypeChange("expense")}
+              size="lg"
+              variant="secondary"
+              className="size-52"
+            >
+              <Pencil />
+              Manual
+            </Button>
+            <Button
+              type="button"
+              onClick={() => handleTypeChange("receipt")}
+              size="lg"
+              variant="secondary"
+              className="size-52"
+            >
+              <Receipt />
+              Receipt
+            </Button>
+          </div>
+        )}
 
-          {formType && (
-            <>
-              <Button type="button" onClick={() => handleTypeChange(null)}>
-                <ArrowLeft /> Back
-              </Button>
+        {formType && (
+          <>
+            <Button type="button" onClick={() => handleTypeChange(null)} size="sm">
+              <ArrowLeft /> Back
+            </Button>
 
-              {formType === "receipt" && <ImageForm />}
+            {formType === "receipt" && <ImageForm />}
 
-              {formType === "expense" && <ExpenseForm />}
+            {formType === "expense" && <ExpenseForm />}
 
-              <Button type="submit" className="mt-4" disabled={loading}>
-                {loading ? (
-                  <>
-                    Creating Expense
-                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  </>
-                ) : (
-                  "Create Expense"
-                )}
-              </Button>
-            </>
-          )}
-        </form>
-      </Form>
-    </div>
+            <Button type="submit" className="mt-4" disabled={loading}>
+              {loading ? (
+                <>
+                  Creating Expense
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                "Create Expense"
+              )}
+            </Button>
+          </>
+        )}
+      </form>
+    </Form>
   );
 };
 
