@@ -39,12 +39,11 @@ function Home() {
           <TabsTrigger value="add-expense">Add Expense</TabsTrigger>
           <TabsTrigger value="expense-list">Expense List</TabsTrigger>
         </TabsList>
-        <TabsContent value="dashboard">
+        <TabsContent value="dashboard" className="w-full">
           <Dashboard />
         </TabsContent>
         <TabsContent
           value="add-expense"
-          className="flex items-center justify-center w-full"
         >
           <CreateExpenseForm />
         </TabsContent>

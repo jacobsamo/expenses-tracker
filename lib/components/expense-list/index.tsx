@@ -5,6 +5,7 @@ import { format } from "date-fns";
 // import { DataTableColumnHeade } from "@/lib/components/ui/data-table/sortable-column-header";
 import { DataTable } from "@/lib/components/ui/data-table";
 import { DataTableToggleSortColumnHeader } from "@/lib/components/ui/data-table/toggle-sort-header";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 export const expenseTableColumns: ColumnDef<Expense>[] = [
   {
@@ -48,6 +49,10 @@ export const expenseTableColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "receiptUrl",
     header: "Receipt",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];
 

@@ -5,6 +5,7 @@ export function TotalExpense({ expenses }: { expenses: Expense[] | null }) {
   const totalExpense = expenses
     ? expenses.reduce((sum, expense) => sum + expense.amount, 0)
     : null;
+  // const averageDailyExpense = expenses.reduce((sum, expense) => expense.date.)
 
   return (
     <Card>
