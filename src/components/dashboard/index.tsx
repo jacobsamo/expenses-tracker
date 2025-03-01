@@ -26,6 +26,7 @@ import { ExpenseBarChart } from "./ExpenseBarChart";
 import { ExpensePieChart } from "./ExpensePieChart";
 import { ExpenseWeeklyChart } from "./ExpenseWeeklyChart";
 import { ExpenseLineChart } from "./ExpenseLineChart";
+import { getExpenses } from "@/db/actions/get-expense";
 
 // Generate random expenses for the last 3 months
 export default function Dashboard() {
@@ -37,12 +38,7 @@ export default function Dashboard() {
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      const response = await fetch("/api/expenses");
-      if (response.ok) {
-        const data = (await response.json()) as Expense[];
-        return data;
-      }
-      return null;
+      return getExpenses();
     },
   });
 
@@ -91,7 +87,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <DateRangePicker onSelect={(range) => {}} />
+        <DateRangePicker onSelect={(range) => { }} />
         <CategoryFilter
           categories={categoryEnum}
           onSelect={setSelectedCategory}
@@ -100,25 +96,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <TotalExpense expenses={expensesByDate} />
         <DisplayPieChart
-          expenses={expensesByDate ?? []}
-          chartTitle="Expense in date range"
+          chartTitle="Expenses by Category"
+          expenses={expensesByDate}
         />
-        <Card className="md:col-span-2 lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Daily Expenses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExpenseBarChart expenses={expensesByDate} />
-          </CardContent>
-        </Card>
-        <Card className="md:col-span-2 lg:col-span-1">
-          <CardHeader>
-            <CardTitle>Expenses by Category</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ExpensePieChart expenses={expensesByDate} />
-          </CardContent>
-        </Card>
+
         <Card className="col-span-full">
           <CardHeader>
             <CardTitle>Expense Trend</CardTitle>

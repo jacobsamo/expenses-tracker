@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { Expense } from "@/types";
 import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table"
-import { DataTableColumnHeader } from "@/components/ui/data-table/sortable-column-header";
+// import { DataTableColumnHeade } from "@/components/ui/data-table/sortable-column-header";
+import { DataTableToggleSortColumnHeader } from "@/components/ui/data-table/toggle-sort-header";
 import { DataTable } from "@/components/ui/data-table";
 
 
@@ -16,7 +17,7 @@ export const expenseTableColumns: ColumnDef<Expense>[] = [
   {
     accessorKey: "amount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
+      <DataTableToggleSortColumnHeader column={column} title="Amount" />
     ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"))
@@ -34,7 +35,9 @@ export const expenseTableColumns: ColumnDef<Expense>[] = [
   },
   {
     accessorKey: "date",
-    header: "Date",
+    header: ({ column }) => (
+      <DataTableToggleSortColumnHeader column={column} title="Date" />
+    ),
     cell: ({ row }) => <div className="text-right font-medium">{format(new Date(row.getValue("date")), "PP p")}</div>
   },
   {

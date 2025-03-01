@@ -4,7 +4,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   type ChartConfig,
@@ -14,31 +14,32 @@ import {
 } from "@/components/ui/chart";
 import type { Expense } from "@/types";
 import * as React from "react";
-import { Label, Pie, PieChart } from "recharts";
+import { Cell, Label, Pie, PieChart } from "recharts";
 
 const chartConfig = {
   fuel: {
     label: "Fuel",
+    color: "var(--chart-5)",
   },
   groceries: {
     label: "Groceries",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
   food: {
     label: "Food",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-2)",
   },
   activities: {
     label: "Activities",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-3)",
   },
   accommodation: {
     label: "Accommodation",
-    color: "hsl(var(--chart-4))",
+    color: "var(--chart-4)",
   },
   "going-out": {
     label: "Going Out",
-    color: "hsl(var(--chart-5))",
+    color: "var(--chart-5)",
   },
 } satisfies ChartConfig;
 
@@ -77,11 +78,24 @@ export function DisplayPieChart({
             />
             <Pie
               data={expenses}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="amount"
+              nameKey="category"
               innerRadius={60}
-              strokeWidth={5}
+              outerRadius={80}
+              paddingAngle={2}
+              strokeWidth={2}
             >
+              {expenses.map((entry, index) => {
+                const category = entry.category as keyof typeof chartConfig;
+                return (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={
+                      chartConfig[category]?.color || `var(--chart-${index})`
+                    }
+                  />
+                );
+              })}
               <Label
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -97,7 +111,7 @@ export function DisplayPieChart({
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalExpenses.toLocaleString()}
+                          $ {totalExpenses.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}

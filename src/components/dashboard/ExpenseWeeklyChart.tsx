@@ -44,7 +44,7 @@ export function ExpenseWeeklyChart({ expenses }: { expenses: Expense[] }) {
         <XAxis dataKey="week" />
         <YAxis />
         <Tooltip />
-        <Bar dataKey="amount" fill="hsl(var(--primary))" />
+        <Bar dataKey="amount" fill="var(--primary)" />
       </BarChart>
     </ResponsiveContainer>
   );

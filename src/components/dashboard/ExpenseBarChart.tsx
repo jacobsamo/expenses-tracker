@@ -29,7 +29,7 @@ export function ExpenseBarChart({ expenses }: { expenses: Expense[] }) {
   //       <XAxis dataKey="date" />
   //       <YAxis />
   //       <Tooltip />
-  //       <Bar dataKey="amount" fill="hsl(var(--primary))" />
+  //       <Bar dataKey="amount" fill="=var(--primary)" />
   //     </BarChart>
   //   </ResponsiveContainer>
   // );

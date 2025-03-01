@@ -33,7 +33,7 @@ export function ExpenseLineChart({ expenses }: { expenses: Expense[] }) {
         <Line
           type="monotone"
           dataKey="amount"
-          stroke="hsl(var(--primary))"
+          stroke="var(--primary)"
           activeDot={{ r: 8 }}
         />
       </LineChart>
