@@ -1,7 +1,8 @@
-import { createEnv } from "@t3-oss/env-nextjs";
+import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
 export const env = createEnv({
+  clientPrefix: "VITE_",
   server: {
     BETTER_AUTH_SECRET: z.string().min(1),
     BETTER_AUTH_URL: z.string().min(1),
@@ -17,28 +18,26 @@ export const env = createEnv({
     R2_PUBLIC_URL: z.string().min(1),
   },
   client: {
-    NEXT_PUBLIC_APP_URL: z.string().min(1),
+    VITE_BASE_URL: z.string().min(1),
   },
-  // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
-  runtimeEnv: {
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  /**
+   * What object holds the environment variables at runtime. This is usually
+   * `process.env` or `import.meta.env`.
+   */
+  runtimeEnv: process.env,
 
-    // Server
-    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_GENERATIVE_AI_API_KEY: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-    TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
-    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
-    R2_BUCKET: process.env.R2_BUCKET,
-    R2_ACCESS_KEY: process.env.R2_ACCESS_KEY,
-    R2_ACCESS_ID: process.env.R2_ACCESS_ID,
-    R2_ENDPOINT: process.env.R2_ENDPOINT,
-    R2_PUBLIC_URL: process.env.R2_PUBLIC_URL,
-  },
-  // For Next.js >= 13.4.4, you only need to destructure client variables:
-  // experimental__runtimeEnv: {
-  //   NEXT_PUBLIC_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
-  // }
+  /**
+   * By default, this library will feed the environment variables directly to
+   * the Zod validator.
+   *
+   * This means that if you have an empty string for a value that is supposed
+   * to be a number (e.g. `PORT=` in a ".env" file), Zod will incorrectly flag
+   * it as a type mismatch violation. Additionally, if you have an empty string
+   * for a value that is supposed to be a string with a default value (e.g.
+   * `DOMAIN=` in an ".env" file), the default value will never be applied.
+   *
+   * In order to solve these issues, we recommend that all new projects
+   * explicitly specify this option as true.
+   */
+  emptyStringAsUndefined: true,
 });
