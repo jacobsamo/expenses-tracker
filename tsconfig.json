@@ -1,39 +1,23 @@
 {
+  "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "module": "ESNext",
-    "moduleDetection": "force",
-    "jsx": "preserve",
-    "allowJs": true,
-    "skipLibCheck": true,
     "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "isolatedModules": true,
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "env": ["./env.ts"]
+      "@/*": ["./*"]
     },
-    "types": ["bun-types", "@types/bun"]
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "tailwind.config.ts"
-  ],
-  "exclude": ["node_modules"]
+    "noEmit": true,
+    "strictNullChecks": true
+  }
 }

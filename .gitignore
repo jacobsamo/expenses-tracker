@@ -1,3 +1,26 @@
+node_modules
+package-lock.json
+yarn.lock
+
+.DS_Store
+.cache
+.env
+
+.data
+.vercel
+.output
+.vinxi
+.wrangler
+.netlify
+dist
+/build/
+/api/
+/server/build
+/public/build
+
+# docker-compose db
+db
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
