@@ -2,7 +2,7 @@
 name = "expense-tracker"
 pages_build_output_dir = "./dist"
 compatibility_flags = ["nodejs_compat"]
-compatibility_date = "2024-12-26"
+compatibility_date = "2024-11-13"
 
 
 [observability]
