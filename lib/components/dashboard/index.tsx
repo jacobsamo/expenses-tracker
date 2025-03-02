@@ -1,13 +1,10 @@
 import CreateExpenseModal from "@/lib/components/modals/create-expense-modal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/lib/components/ui/card";
-import { getExpenses } from "@/lib/server/db/actions/get-expense";
-import { categoryEnum } from "@/lib/server/db/schemas";
+import { getExpenses } from "@/lib/utils/get-expense";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { ExpenseList } from "../expense-list";
-import { CategoryFilter } from "./CategoryFilter";
-import { DateRangePicker } from "./DateRangePicker";
 import { ExpenseLineChart } from "./ExpenseLineChart";
 import { ExpenseWeeklyChart } from "./ExpenseWeeklyChart";
 import { DisplayPieChart } from "./pie-chart";
@@ -23,7 +20,7 @@ export default function Dashboard() {
   const { data: expenses, isLoading } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      return getExpenses();
+      return await getExpenses();
     },
   });
 

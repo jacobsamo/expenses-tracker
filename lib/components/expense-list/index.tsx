@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { DataTable } from "@/lib/components/ui/data-table";
 import { DataTableToggleSortColumnHeader } from "@/lib/components/ui/data-table/toggle-sort-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { getExpenses } from "@/lib/utils/get-expense";
+
 
 export const expenseTableColumns: ColumnDef<Expense>[] = [
   {
@@ -60,11 +62,7 @@ export function ExpenseList() {
   const { data: expenses } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      const response = await fetch("/api/expenses");
-      if (response.ok) {
-        return (await response.json()) as Expense[];
-      }
-      return null;
+      return await getExpenses()
     },
   });
   if (!expenses || expenses === undefined) return <div>Not Expense created yet</div>;
