@@ -34,7 +34,7 @@ export const APIRoute = createAPIFileRoute("/api/expenses/$expenseId")({
     }
 
     await db.delete(expensesTable).where(eq(expensesTable.expenseId, params.expenseId));
-    console.log(`Deleted expense with id: ${params.expenseId}`)
+    console.log(`Deleted expense with id: ${params.expenseId}`);
     return json({ message: `Deleted expense with id: ${params.expenseId}` });
   },
   PUT: async ({ request, params }) => {

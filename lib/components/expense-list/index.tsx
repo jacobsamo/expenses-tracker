@@ -62,7 +62,7 @@ export function ExpenseList() {
   const { data: expenses } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      return await getExpenses()
+      return await getExpenses();
     },
   });
   if (!expenses || expenses === undefined) return <div>Not Expense created yet</div>;

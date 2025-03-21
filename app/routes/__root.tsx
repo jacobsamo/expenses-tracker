@@ -8,7 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getEvent, getWebRequest } from "@tanstack/react-start/server";
 import { lazy, Suspense } from "react";
 
 import Providers from "@/lib/components/providers";
@@ -19,15 +19,23 @@ const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
     ? () => null // Render nothing in production
     : lazy(() =>
-      // Lazy load in development
-      import("@tanstack/router-devtools").then((res) => ({
-        default: res.TanStackRouterDevtools,
-      })),
-    );
+        // Lazy load in development
+        import("@tanstack/router-devtools").then((res) => ({
+          default: res.TanStackRouterDevtools,
+        })),
+      );
 
 const getUser = createServerFn({ method: "GET" }).handler(async () => {
   const { headers } = getWebRequest()!;
-  const session = await auth.api.getSession({ headers });
+  const event = getEvent();
+  const env = event.context.cloudflare.env;
+
+  const authentication = auth(
+    env.VITE_BASE_URL,
+    env.GOOGLE_CLIENT_ID,
+    env.GOOGLE_CLIENT_SECRET,
+  );
+  const session = await authentication.api.getSession({ headers });
 
   return session?.user || null;
 });
