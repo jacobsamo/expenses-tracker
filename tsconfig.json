@@ -15,8 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "env": ["./env.ts"]
+      "@/*": ["./*"]
     },
     "noEmit": true,
     "strictNullChecks": true

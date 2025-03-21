@@ -10,7 +10,6 @@ yarn.lock
 .vercel
 .output
 .vinxi
-.wrangler
 .netlify
 dist
 /build/
@@ -67,3 +66,7 @@ next-env.d.ts
 expense-local.db
 expense-local.db-shm
 expense-local.db-wal
+
+#Cloudflare
+.wrangler
+.dev.vars*
