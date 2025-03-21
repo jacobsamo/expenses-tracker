@@ -2,7 +2,7 @@
   "name": "expense-tracker",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.2.4",
+  "packageManager": "bun@1.2.5",
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",

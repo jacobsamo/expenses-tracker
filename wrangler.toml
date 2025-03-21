@@ -4,6 +4,14 @@ pages_build_output_dir = "./dist"
 compatibility_flags = ["nodejs_compat"]
 compatibility_date = "2024-11-13"
 
+[vars]
+VITE_BASE_URL="https://expenses.jacobsamo.com"
+
+
 
 [observability]
 enabled = true
+
+[build]
+command = "bun run build"
+watch_dir = "*"
