@@ -1,4 +1,4 @@
-import { db } from "@/lib/server/db";
+import { createDb } from "@/lib/server/db";
 import { createExpenseFromFile } from "@/lib/server/db/actions/create-expense-from-file";
 import { uploadReceipt } from "@/lib/server/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/lib/server/db/schemas";
@@ -7,6 +7,7 @@ import type { Expense, ExpenseItem, NewExpense, NewExpenseItem } from "@/lib/typ
 import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { eq } from "drizzle-orm";
+import { getEvent } from "vinxi/http";
 import { z } from "zod";
 
 export type CreateExpenseReturnType = {
@@ -21,6 +22,10 @@ export const APIRoute = createAPIFileRoute("/api/expenses")({
     if (!session || !session.data?.user) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { context } = getEvent();
+    const env = context.cloudflare.env;
+    const db = createDb(env.TURSO_CONNECTION_URL, env.TURSO_AUTH_TOKEN);
 
     const userExpenses = await db
       .select()
@@ -45,6 +50,9 @@ export const APIRoute = createAPIFileRoute("/api/expenses")({
       if (!type || (type !== "expense" && type !== "receipt")) {
         return Response.json({ error: "Invalid type" }, { status: 400 });
       }
+
+      const { context } = getEvent();
+      const env = context.cloudflare.env;
 
       let reqData;
       if (type === "receipt") {
@@ -75,8 +83,17 @@ export const APIRoute = createAPIFileRoute("/api/expenses")({
         newExpense = { ...data.content.expense, userId };
         newItems = data.content.expenseItems ?? null;
       } else if (data.type === "receipt") {
-        const receiptUrl = await uploadReceipt(data.content.receiptFile);
-        const aiResult = await createExpenseFromFile(data.content.receiptFile);
+        const receiptUrl = await uploadReceipt(data.content.receiptFile, {
+          R2_BUCKET: env.R2_BUCKET,
+          R2_ACCESS_KEY: env.R2_ACCESS_KEY,
+          R2_ACCESS_ID: env.R2_ACCESS_ID,
+          R2_ENDPOINT: env.R2_ENDPOINT,
+          R2_PUBLIC_URL: env.R2_PUBLIC_URL,
+        });
+        const aiResult = await createExpenseFromFile(
+          data.content.receiptFile,
+          env.GOOGLE_GENERATIVE_AI_API_KEY,
+        );
 
         newExpense = {
           ...aiResult.expense,
@@ -102,6 +119,8 @@ export const APIRoute = createAPIFileRoute("/api/expenses")({
         console.error("No expense found");
         return Response.json({ error: "No Expense found" }, { status: 400 });
       }
+
+      const db = createDb(env.TURSO_CONNECTION_URL, env.TURSO_AUTH_TOKEN);
 
       // Insert the expense record into the database
       const [expense] = await db.insert(expensesTable).values(newExpense).returning();

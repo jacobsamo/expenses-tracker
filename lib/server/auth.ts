@@ -1,13 +1,17 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db";
+import { createDb } from "./db";
 
 export const auth = (
   baseUrl: string,
   googleClientId: string,
   googleClientSecret: string,
-) =>
-  betterAuth({
+  connectionUrl: string,
+  authToken: string,
+) => {
+  const db = createDb(connectionUrl, authToken);
+
+  return betterAuth({
     baseURL: baseUrl,
     database: drizzleAdapter(db, {
       provider: "sqlite", // or "mysql", "sqlite"`
@@ -34,3 +38,4 @@ export const auth = (
     //   enabled: true,
     // },
   });
+};
