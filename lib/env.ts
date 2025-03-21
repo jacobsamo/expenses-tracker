@@ -36,6 +36,7 @@ async function parseEnv() {
   let result: ReturnType<typeof envSchema.safeParse>;
 
   if (isInCloudflareCI()) {
+    console.log("Process env", process.env);
     result = envSchema.safeParse(process.env);
   } else {
     result = envSchema.safeParse(await getCloudflareProxyEnv());
