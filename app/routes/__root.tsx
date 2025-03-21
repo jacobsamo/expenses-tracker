@@ -34,6 +34,8 @@ const getUser = createServerFn({ method: "GET" }).handler(async () => {
     env.VITE_BASE_URL,
     env.GOOGLE_CLIENT_ID,
     env.GOOGLE_CLIENT_SECRET,
+    env.TURSO_CONNECTION_URL,
+    env.TURSO_AUTH_TOKEN
   );
   const session = await authentication.api.getSession({ headers });
 
