@@ -4,9 +4,10 @@ import { resolve } from "path";
 import { cloudflare } from "unenv";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { getCloudflareProxyEnv, isInCloudflareCI } from "./lib/cloudflare";
-import { parseEnv } from "./lib/env";
 
-await parseEnv();
+// disable for now as we not need to verify it works right not
+// import { parseEnv } from "./lib/env";
+// await parseEnv();
 
 async function proxyCloudflareEnv() {
   if (isInCloudflareCI()) return undefined;
