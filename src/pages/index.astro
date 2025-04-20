@@ -1,0 +1,21 @@
+---
+export const prerender = false;
+import { buttonVariants } from '@/lib/components/ui/button';
+import Layout from '../layouts/Layout.astro';
+import LandingPage from "@/lib/components/landing-page"
+
+const session = Astro.locals.session;
+---
+
+<Layout>
+  {session ? <LandingPage client:load /> : <div class="flex items-center justify-center h-screen">
+    <div class="text-center">
+      <h1 class="text-3xl font-bold mb-4">Road Trip Expense Tracker</h1>
+      <p>Please sign in to view your expenses.</p>
+      <a href="/signin" class={buttonVariants()}>
+        Login
+      </a>
+    </div>
+  </div>}
+
+</Layout>

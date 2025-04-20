@@ -1,0 +1,9 @@
+---
+export const prerender = false
+import Layout from "@/layouts/Layout.astro";
+import SignInPage from '@/lib/components/sign-in-page';
+---
+
+<Layout>
+  <SignInPage client:load />
+</Layout>
