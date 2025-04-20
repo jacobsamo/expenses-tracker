@@ -1,7 +1,6 @@
-import { real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { customType, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { v4 as uuid } from "uuid";
 import { user } from "./auth-schema";
-import { customType } from "drizzle-orm/sqlite-core";
 
 const dateType = customType<{ data: Date; driverData: string }>({
   dataType() {

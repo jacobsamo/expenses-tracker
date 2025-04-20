@@ -3,7 +3,13 @@ import React from "react";
 import { Toaster } from "sonner";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
-  const [queryClient] = React.useState(() => new QueryClient());
+  const [queryClient] = React.useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+        },
+      }),
+  );
 
   return (
     <>

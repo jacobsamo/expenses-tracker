@@ -1,5 +1,5 @@
 {
-  "name": "astro",
+  "name": "expense-tracker",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -11,14 +11,15 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "ui": "bunx --bun shadcn@canary",
-    "db:auth": "bunx @better-auth/cli generate --config ./src/lib/auth/index.ts --output ./src/db/schemas",
+    "db:auth": "bunx @better-auth/cli generate --config ./src/lib/auth/index.ts --output ./src/lib/db/schemas",
     "db:studio": "drizzle-kit studio",
     "db:studio:prd": "cross-env NODE_ENV=production drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:setup": "touch expenses-local.db && bun db:generate",
-    "db:local-start": "turso dev --db-file expense-local.db"
+    "db:local-start": "turso dev --db-file expense-local.db",
+    "kv-create": "bunx wrangler kv namespace create 'SESSION'"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.12",

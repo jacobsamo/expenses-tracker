@@ -1,16 +1,20 @@
 import { VITE_BASE_URL } from "astro:env/client";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "astro:env/server";
+import {
+  BETTER_AUTH_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} from "astro:env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "./db";
 
 export const auth = betterAuth({
-  baseURL: "http://localhost:3000",
+  baseURL: VITE_BASE_URL,
+  secret: BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "sqlite", // or "mysql", "sqlite"`
   }),
 
-  // https://www.better-auth.com/docs/concepts/session-management#session-caching
   session: {
     cookieCache: {
       enabled: true,
@@ -23,7 +27,7 @@ export const auth = betterAuth({
     google: {
       clientId: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      redirectURI: VITE_BASE_URL,
+      // redirectURI: VITE_BASE_URL,
     },
   },
   onAPIError: {

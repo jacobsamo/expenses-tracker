@@ -11,6 +11,7 @@ export default defineConfig({
       enabled: true,
       configPath: "wrangler.jsonc",
     },
+    // imageService: "compile",
   }),
   output: "server",
   integrations: [react()],
@@ -20,9 +21,6 @@ export default defineConfig({
       external: [],
     },
   },
-  // image: {
-  //   service: 'compile'
-  // },
   env: {
     schema: {
       VITE_BASE_URL: envField.string({

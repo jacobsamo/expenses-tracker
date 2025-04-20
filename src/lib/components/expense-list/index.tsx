@@ -1,13 +1,13 @@
 import type { Expense } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 // import { DataTableColumnHeade } from "@/lib/components/ui/data-table/sortable-column-header";
 import { DataTable } from "@/lib/components/ui/data-table";
 import { DataTableToggleSortColumnHeader } from "@/lib/components/ui/data-table/toggle-sort-header";
-import { DataTableRowActions } from "./data-table-row-actions";
 import { getExpenses } from "@/lib/utils/get-expense";
-
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { DataTableRowActions } from "./data-table-row-actions";
 
 export const expenseTableColumns: ColumnDef<Expense>[] = [
   {
@@ -58,14 +58,24 @@ export const expenseTableColumns: ColumnDef<Expense>[] = [
   },
 ];
 
+
+
 export function ExpenseList() {
-  const { data: expenses } = useQuery({
+  const {
+    data: expenses,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
-      return await getExpenses()
+      return await getExpenses();
     },
+    // retry: false, // Don't retry on 401
   });
-  if (!expenses || expenses === undefined) return <div>Not Expense created yet</div>;
+
+  if (isLoading) return <Loader2 className="animate-spin rounded-full size-8" />;
+
+  if (!expenses || expenses.length === 0) return <div>No expenses created yet</div>;
 
   return <DataTable columns={expenseTableColumns} data={expenses} />;
 }

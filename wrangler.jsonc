@@ -2,19 +2,30 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "expense-tracker",
   "main": "./dist/_worker.js/index.js",
+  "dev": {
+    "port": 3000,
+  },
   "compatibility_date": "2025-04-15",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "binding": "ASSETS",
-    "directory": "./dist"
+    "directory": "./dist",
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
+  // "kv": [
+  //     {
+  //       "binding": "SESSION",
+  //       // "preview_id": "local-session-kv",
+  //       "id": "47621e68b3514afbaa6a8f8989593d7e"
+  //     }
+  //   ],
   "kv_namespaces": [
     {
       "binding": "SESSION",
-      "id": "expense-tracker-sessions"
+      "preview_id": "local-session-kv",
+      "id": "47621e68b3514afbaa6a8f8989593d7e"
     }
   ]
 }

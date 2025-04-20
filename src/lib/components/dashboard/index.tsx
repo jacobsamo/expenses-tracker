@@ -17,11 +17,16 @@ export default function Dashboard() {
   >();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data: expenses, isLoading } = useQuery({
+  const {
+    data: expenses,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["expenses"],
     queryFn: async () => {
       return await getExpenses();
     },
+    // retry: false, // Don't retry on 401
   });
 
   const filteredExpenses = () => {
@@ -50,6 +55,19 @@ export default function Dashboard() {
 
   if (isLoading) {
     return <Loader2 className="h-16 w-16 animate-spin" />;
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Error Loading Expenses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>There was an error loading your expenses. Please try again later.</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (!expensesByDate) {
