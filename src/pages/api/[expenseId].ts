@@ -1,15 +1,25 @@
 import { db } from "@/lib/server/db";
 import { expensesTable } from "@/lib/server/db/schemas";
-import { getSession } from "@/lib/session";
 import { updateExpenseSchema } from "@/lib/zod-schemas";
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import { and, eq } from "drizzle-orm";
 
-export const GET: APIRoute = async ({ request, params }) => {
-  const session = await getSession({ headers: request.headers });
+export const GET = async (context: APIContext) => {
+  const { params, locals } = context;
 
-  if (!session || !session?.user) {
+  if (!locals.session || !locals?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
+  if (!params.expenseId) {
+    return Response.json(
+      {
+        message: "No expenseId provided",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const userExpenses = await db
@@ -17,7 +27,7 @@ export const GET: APIRoute = async ({ request, params }) => {
     .from(expensesTable)
     .where(
       and(
-        eq(expensesTable.userId, session.user.id),
+        eq(expensesTable.userId, locals.user.id),
         eq(expensesTable.expenseId, params.expenseId),
       ),
     );
@@ -25,11 +35,22 @@ export const GET: APIRoute = async ({ request, params }) => {
   return new Response(JSON.stringify(userExpenses), { status: 200 });
 };
 
-export const DELETE: APIRoute = async ({ request, params }) => {
-  const session = await getSession({ headers: request.headers });
+export const DELETE: APIRoute = async (context: APIContext) => {
+  const { params, locals } = context;
 
-  if (!session || !session?.user) {
+  if (!locals.session || !locals?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
+  if (!params.expenseId) {
+    return Response.json(
+      {
+        message: "No expenseId provided",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   await db.delete(expensesTable).where(eq(expensesTable.expenseId, params.expenseId));
@@ -40,11 +61,22 @@ export const DELETE: APIRoute = async ({ request, params }) => {
   );
 };
 
-export const PUT: APIRoute = async ({ request, params }) => {
-  const session = await getSession({ headers: request.headers });
+export const PUT: APIRoute = async (context: APIContext) => {
+  const { params, request, locals } = context;
 
-  if (!session || !session?.user) {
+  if (!locals.session || !locals?.user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
+  if (!params.expenseId) {
+    return Response.json(
+      {
+        message: "No expenseId provided",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 
   const j = await request.json();

@@ -7,7 +7,6 @@ import { createAuthClient as createReactAuthClient } from "better-auth/react";
 
 const authConfig: ClientOptions = {
   baseURL: VITE_BASE_URL,
-  
 };
 
 export const reactAuthClient = createReactAuthClient(authConfig);

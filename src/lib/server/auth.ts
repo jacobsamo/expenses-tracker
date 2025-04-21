@@ -17,9 +17,13 @@ export const auth = betterAuth({
 
   session: {
     cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5 minutes
+      enabled: false, // Disable cookie caching
     },
+  },
+
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
   },
 
   // https://www.better-auth.com/docs/concepts/oauth

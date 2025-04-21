@@ -1,53 +1,39 @@
 import { auth } from "@/lib/server/auth";
-import { defineMiddleware } from "astro:middleware";
+import type { APIContext, MiddlewareNext } from "astro";
+import { sequence } from "astro:middleware";
 
-export const onRequest = defineMiddleware(async (context, next) => {
-  // const isAuthed = await auth.api.getSession({
-  //   headers: context.request.headers,
-  // });
+const authMiddleware = async (context: APIContext, next: MiddlewareNext) => {
+  const isAuthed = await auth.api.getSession({
+    headers: context.request.headers,
+  });
 
-  // // // Set user and session in locals
-  // if (isAuthed) {
-  //   context.locals.user = isAuthed.user;
-  //   context.locals.session = isAuthed.session;
-  // } else {
-  //   context.locals.user = null;
-  //   context.locals.session = null;
-  // }
+  if (isAuthed) {
+    context.locals.user = isAuthed.user;
+    context.locals.session = isAuthed.session;
+    return await next();
+  }
 
-  // const path = context.url.pathname;
+  context.locals.user = null;
+  context.locals.session = null;
 
-  // // Allow all requests to /api/auth/* regardless of auth status
-  // if (path.startsWith("/api/auth/")) {
-  //   return next();
-  // }
+  return await next();
+};
 
-  // // For API requests, don't redirect, just return 401
-  // if (path.startsWith("/api/")) {
-  //   // if (!isAuthed) {
-  //   //   return new Response(JSON.stringify({ error: "Unauthorized" }), {
-  //   //     status: 401,
-  //   //     headers: {
-  //   //       "Content-Type": "application/json",
-  //   //     },
-  //   //   });
-  //   // }
-  //   return next();
-  // }
+const protectRoutes = async (context: APIContext, next: MiddlewareNext) => {
+  const isAuthed = context.locals.session;
+  const path = context.url.pathname;
 
-  // if (!isAuthed) {
-  //   return next()
-  // }
+  if (!isAuthed && path === "/") {
+    return context.rewrite(
+      new Request("/login", {
+        headers: {
+          "x-redirect-to": context.url.pathname,
+        },
+      }),
+    );
+  }
 
-  // // If user is authenticated and trying to access /login, redirect to home
-  // if (isAuthed && path === "/login") {
-  //   return Response.redirect(new URL("/", context.url), 302);
-  // }
+  return await next();
+};
 
-  // // If user is not authenticated and trying to access protected routes, redirect to login
-  // if (!isAuthed && path !== "/login") {
-  //   return Response.redirect(new URL("/login", context.url), 302);
-  // }
-
-  return next();
-});
+export const onRequest = sequence(authMiddleware, protectRoutes);

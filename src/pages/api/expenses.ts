@@ -2,10 +2,9 @@ import { db } from "@/lib/server/db";
 import { createExpenseFromFile } from "@/lib/server/db/actions/create-expense-from-file";
 import { uploadReceipt } from "@/lib/server/db/actions/upload-receipt";
 import { expensesTable, itemsTable } from "@/lib/server/db/schemas";
-import { getSession } from "@/lib/session";
 import type { ExpenseItem, NewExpense, NewExpenseItem } from "@/lib/types";
 import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import {
   GOOGLE_GENERATIVE_AI_API_KEY,
   R2_ACCESS_ID,
@@ -17,19 +16,18 @@ import {
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async (context: APIContext) => {
   try {
-    console.log("Hit expense api");
-    const session = await getSession({ headers: request.headers });
+    const { locals } = context;
 
-    if (!session || !session?.user) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    if (!locals.session || !locals?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
     const userExpenses = await db
       .select()
       .from(expensesTable)
-      .where(eq(expensesTable.userId, session.user.id));
+      .where(eq(expensesTable.userId, locals.user.id));
 
     return Response.json(userExpenses);
   } catch (error) {
@@ -38,16 +36,16 @@ export const GET: APIRoute = async ({ request }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context: APIContext) => {
   try {
-    const session = await getSession({ headers: request.headers });
+    console.log(JSON.stringify(context));
+    const { request, locals } = context;
 
-    if (!session || !session?.user) {
-      console.error("No user");
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    if (!locals.session || !locals?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const { id: userId } = session.user;
+    const { id: userId } = locals.user;
     const formData = await request.formData();
 
     const type = formData.get("type");

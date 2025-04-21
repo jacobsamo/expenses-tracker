@@ -1,9 +1,7 @@
-import { auth } from "@/lib/server/auth";
+// import { auth } from "@/lib/server/auth";
 
-export const getSession = async ({ headers }: { headers: Headers }) => {
-  const session = await auth.api.getSession({
-    headers: headers,
-  });
+// export const getSession = async ({ headers }: { headers: Headers }) => {
+//   const session = Astro.locals.session
 
-  return session;
-};
+//   return session;
+// };

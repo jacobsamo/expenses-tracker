@@ -7,6 +7,12 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     () =>
       new QueryClient({
         defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+            retry: 1,
+          },
         },
       }),
   );
