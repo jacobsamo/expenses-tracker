@@ -38,7 +38,6 @@ export const GET: APIRoute = async (context: APIContext) => {
 
 export const POST: APIRoute = async (context: APIContext) => {
   try {
-    console.log(JSON.stringify(context));
     const { request, locals } = context;
 
     if (!locals.session || !locals?.user) {

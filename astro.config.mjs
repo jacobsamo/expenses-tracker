@@ -26,17 +26,17 @@ export default defineConfig({
       VITE_BASE_URL: envField.string({
         context: "client",
         access: "public",
-        url: true,
+        // url: true,
       }),
       BETTER_AUTH_SECRET: envField.string({
         context: "server",
         access: "secret",
       }),
-      BETTER_AUTH_URL: envField.string({
-        context: "server",
-        access: "public",
-        url: true,
-      }),
+      // BETTER_AUTH_URL: envField.string({
+      //   context: "server",
+      //   access: "public",
+      //   // url: true,
+      // }),
       GOOGLE_CLIENT_SECRET: envField.string({
         context: "server",
         access: "secret",

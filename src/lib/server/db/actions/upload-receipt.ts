@@ -3,11 +3,11 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 export const uploadReceipt = async (
   receiptFile: File,
   env: {
-    R2_BUCKET: string,
-    R2_ACCESS_KEY: string,
-    R2_ACCESS_ID: string,
-    R2_ENDPOINT: string,
-    R2_PUBLIC_URL: string,
+    R2_BUCKET: string;
+    R2_ACCESS_KEY: string;
+    R2_ACCESS_ID: string;
+    R2_ENDPOINT: string;
+    R2_PUBLIC_URL: string;
   },
 ) => {
   console.log("Starting receipt upload");
@@ -16,12 +16,12 @@ export const uploadReceipt = async (
     endpoint: env.R2_ENDPOINT,
     credentials: {
       accessKeyId: env.R2_ACCESS_ID,
-      secretAccessKey: env.R2_ACCESS_ID,
+      secretAccessKey: env.R2_ACCESS_KEY,
     },
     region: "auto", // for Cloudflare R2
   });
 
-  const uniqueFileName = `receipts/${Date.now()}-${receiptFile.name}`;
+  const uniqueFileName = `receipts/${Date.now()}`;
 
   try {
     // Convert File to Buffer
