@@ -1,7 +1,7 @@
 import { CreateNewExpenseSchema } from "@/lib/zod-schemas";
 import { useFormContext } from "react-hook-form";
 import type { z } from "zod";
-import { DateTimePicker } from "../ui/date-time-picker";
+import { DateTimePicker } from "@/lib/components/ui/date-time-picker";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import {
