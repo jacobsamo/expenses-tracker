@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import ExpenseForm from "./expense-form";
 import ImageForm from "./image-form";
+import type { Expense } from "@/lib/types";
 
 type TCreateNewExpenseSchema = z.infer<typeof CreateNewExpenseSchema>;
 
@@ -71,10 +72,10 @@ const CreateExpenseForm = () => {
 
       const res = await req.json();
 
-      return res;
+      return res as Expense;
     },
     onSuccess: (data) => {
-      toast.success(data.message, {
+      toast.success("Successfully created expense", {
         description: "Created Expense!",
       });
       setLoading(false);

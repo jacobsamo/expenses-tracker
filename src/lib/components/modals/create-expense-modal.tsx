@@ -1,20 +1,13 @@
 import { PlusIcon } from "lucide-react";
 import ExpenseForm from "../create-expense-form";
 import { buttonVariants } from "../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../ui/dialog";
 
 interface CreateExpenseModalProps {
   triggerType?: "button" | "circle";
 }
 
-const CreateExpenseModal = ({
-  triggerType = "button",
-}: CreateExpenseModalProps) => {
+const CreateExpenseModal = ({ triggerType = "button" }: CreateExpenseModalProps) => {
   return (
     <Dialog>
       <DialogTrigger

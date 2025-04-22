@@ -58,8 +58,6 @@ export const expenseTableColumns: ColumnDef<Expense>[] = [
   },
 ];
 
-
-
 export function ExpenseList() {
   const {
     data: expenses,

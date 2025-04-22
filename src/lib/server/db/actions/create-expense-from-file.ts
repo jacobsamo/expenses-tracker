@@ -76,7 +76,6 @@ export const createExpenseFromFile = async (
     finishReason: aiReq.finishReason,
     usage: aiReq.usage,
     warning: aiReq.warnings,
-    metadata: aiReq.experimental_providerMetadata,
   });
 
   return {

@@ -1,6 +1,6 @@
+import { TURSO_AUTH_TOKEN, TURSO_CONNECTION_URL } from "astro:env/server";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schemas";
-import { TURSO_CONNECTION_URL, TURSO_AUTH_TOKEN } from "astro:env/server";
 
 export const db = drizzle({
   connection: import.meta.env.PROD
