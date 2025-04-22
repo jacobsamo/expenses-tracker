@@ -28,3 +28,7 @@ pnpm-debug.log*
 expense-local.db
 expense-local.db-shm
 expense-local.db-wal
+
+#Cloudflare
+.wrangler
+.dev.vars*
