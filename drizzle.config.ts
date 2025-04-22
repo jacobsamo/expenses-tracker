@@ -3,7 +3,7 @@ require("dotenv").config();
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./lib/server/db/schemas",
+  schema: "./src/lib/server/db/schemas",
   out: "./drizzle/migrations",
   dialect: "turso",
   dbCredentials:

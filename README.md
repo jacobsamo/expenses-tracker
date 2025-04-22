@@ -1,77 +1,48 @@
-# [TanStarter](https://github.com/dotnize/tanstarter)
+# Astro Starter Kit: Basics
 
-A minimal starter template for 🏝️ TanStack Start.
+```sh
+bun create astro@latest -- --template basics
+```
 
-- TanStack [Start](https://tanstack.com/start/latest) + [Router](https://tanstack.com/router/latest) + [Query](https://tanstack.com/query/latest)
-- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
-- [Drizzle ORM](https://orm.drizzle.team/) + PostgreSQL
-- [Better Auth](https://www.better-auth.com/) with OAuth2 for GitHub, Google, and Discord.
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
+[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
 
-## Getting Started
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-1. [Use this template](https://github.com/new?template_name=tanstarter&template_owner=dotnize) or clone this repository.
+![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
 
-2. Install dependencies:
+## 🚀 Project Structure
 
-   ```bash
-   pnpm install # npm install
-   ```
+Inside of your Astro project, you'll see the following folders and files:
 
-3. Create a `.env` file based on [`.env.example`](./.env.example).
+```text
+/
+├── public/
+│   └── favicon.svg
+├── src/
+│   ├── layouts/
+│   │   └── Layout.astro
+│   └── pages/
+│       └── index.astro
+└── package.json
+```
 
-4. Push the schema to your database with drizzle-kit:
+To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
 
-   ```bash
-   pnpm db push # npm run db push
-   ```
+## 🧞 Commands
 
-   https://orm.drizzle.team/docs/migrations
+All commands are run from the root of the project, from a terminal:
 
-5. Run the development server:
+| Command               | Action                                           |
+| :-------------------- | :----------------------------------------------- |
+| `bun install`         | Installs dependencies                            |
+| `bun dev`             | Starts local dev server at `localhost:4321`      |
+| `bun build`           | Build your production site to `./dist/`          |
+| `bun preview`         | Preview your build locally, before deploying     |
+| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `bun astro -- --help` | Get help using the Astro CLI                     |
 
-   ```bash
-   pnpm dev # npm run dev
-   ```
+## 👀 Want to learn more?
 
-   The development server should be now running at [http://localhost:3000](http://localhost:3000).
-
-## Goodies
-
-#### Scripts
-
-These scripts in [package.json](./package.json#L5) use pnpm by default, but you can update them to use other package managers if you prefer.
-
-- **`auth:generate`** - Regenerate the [auth db schema](./lib/server/schema/auth.schema.ts) if you've made changes to your Better Auth [config](./lib/server/auth.ts).
-- **`db`** - Run drizzle-kit commands. (e.g. `pnpm db generate` to generate a migration)
-- **`ui`** - The shadcn/ui CLI. (e.g. `pnpm ui add button` to add the button component)
-- **`format`** and **`lint`** - Run Prettier and ESLint.
-
-#### Utilities
-
-- [`auth-guard.ts`](./lib/middleware/auth-guard.ts) - Sample middleware for forcing authentication on server functions. ([see #5](https://github.com/dotnize/tanstarter/issues/5))
-- [`ThemeToggle.tsx`](./lib/components/ThemeToggle.tsx) - A simple component to toggle between light and dark mode. ([#7](https://github.com/dotnize/tanstarter/issues/7))
-
-## Building for production
-
-1. Configure [`app.config.ts`](./app.config.ts#L15) for your preferred deployment target. Read the [hosting](https://tanstack.com/start/latest/docs/framework/react/hosting#deployment) docs for more information.
-
-2. Build the application:
-
-   ```bash
-   pnpm build # npm run build
-   ```
-
-3. If building for Node, you start the application via:
-
-   ```bash
-   pnpm start # npm start
-   ```
-
-## Issue watchlist
-
-- https://github.com/shadcn-ui/ui/discussions/6714 - We're using the `canary` version of shadcn/ui for Tailwind v4 support.
-
-## Acknowledgements
-
-- [nekochan0122/tanstack-boilerplate](https://github.com/nekochan0122/tanstack-boilerplate) - A batteries-included TanStack Start boilerplate that inspired some patterns in this template. If you're looking for a more feature-rich starter, check it out!
-- [AlexGaudon/tanstarter-better-auth](https://github.com/AlexGaudon/tanstarter-better-auth) for his own better-auth implementation.
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
