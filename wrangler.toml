@@ -8,8 +8,8 @@ kv_namespaces = [
   { binding = "SESSION", id = "47621e68b3514afbaa6a8f8989593d7e" }
 ]
 
-[assets]
-binding = "ASSETS"
+# [assets]
+# binding = "ASSETS"
 
 
 [dev]
