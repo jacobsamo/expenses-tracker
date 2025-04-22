@@ -3,22 +3,31 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
+import { loadEnv } from "vite";
+
+
+const { MODE } = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 // https://astro.build/config
 export default defineConfig({
+  site: "https://expenses.jacobsamo.com",
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
-      configPath: "wrangler.jsonc",
+      configPath: 'wrangler.toml',
     },
-    // imageService: "compile",
+    imageService: 'passthrough',
   }),
-  output: "server",
+  output: 'server',
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
-    ssr: {
-      external: [],
+    resolve: {
+      // Use react-dom/server.edge instead of react-dom/server.browser for React 19.
+      // Without this, MessageChannel from node:worker_threads needs to be polyfilled.
+      alias: MODE === "production" ? {
+        "react-dom/server": "react-dom/server.edge",
+      } :undefined
     },
   },
   env: {
