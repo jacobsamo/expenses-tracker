@@ -2,6 +2,7 @@
   "name": "expense-tracker",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "bun@1.2.8",
   "scripts": {
     "dev": "wrangler types && astro dev --port 3000",
     "start": "wrangler types && astro dev --port 3000",

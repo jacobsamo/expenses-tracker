@@ -2,6 +2,7 @@
 name = "expense-tracker"
 compatibility_date = "2025-04-15"
 pages_build_output_dir = "./dist"
+# build = { command = "bun run build", watch_dir = "." }
 compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
 
 kv_namespaces = [
