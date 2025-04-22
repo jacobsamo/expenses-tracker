@@ -1,0 +1,19 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "expense-tracker"
+compatibility_date = "2025-04-15"
+pages_build_output_dir = "./dist"
+compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
+
+kv_namespaces = [
+  { binding = "SESSION", id = "47621e68b3514afbaa6a8f8989593d7e" }
+]
+
+[assets]
+binding = "ASSETS"
+
+
+[dev]
+port = 3000
+
+[observability]
+enabled = true

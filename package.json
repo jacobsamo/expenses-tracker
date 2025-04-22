@@ -6,7 +6,7 @@
     "dev": "wrangler types && astro dev --port 3000",
     "start": "wrangler types && astro dev --port 3000",
     "build": "wrangler types && astro check && astro build",
-    "preview": "wrangler types && astro preview",
+    "preview": "wrangler pages dev ./dist",
     "astro": "astro",
     "lint": "eslint .",
     "format": "prettier --write .",
